@@ -118,3 +118,75 @@ npm start
 npm run lint
 ```
 
+## Deployment ke Netlify
+
+Aplikasi sudah dikonfigurasi untuk deploy ke Netlify dengan file `netlify.toml`.
+
+### Cara Deploy:
+
+#### Opsi 1: Deploy via Netlify Dashboard (Recommended)
+
+1. **Push code ke GitHub/GitLab/Bitbucket**
+   ```bash
+   git add .
+   git commit -m "Setup Netlify deployment"
+   git push origin main
+   ```
+
+2. **Login ke Netlify**
+   - Buka [https://app.netlify.com](https://app.netlify.com)
+   - Login dengan GitHub/GitLab/Bitbucket account
+
+3. **Import Project**
+   - Klik "Add new site" → "Import an existing project"
+   - Pilih repository yang berisi frontend code
+   - Netlify akan otomatis mendeteksi konfigurasi dari `netlify.toml`
+
+4. **Set Environment Variables (Optional)**
+   - Jika ingin override API URL, tambahkan di Netlify Dashboard:
+     - Site settings → Environment variables
+     - Key: `NEXT_PUBLIC_API_URL`
+     - Value: `https://be-store-profile.vercel.app/api`
+   - Jika tidak di-set, akan menggunakan default dari `lib/api.ts`
+
+5. **Deploy**
+   - Klik "Deploy site"
+   - Netlify akan otomatis build dan deploy aplikasi
+
+#### Opsi 2: Deploy via Netlify CLI
+
+1. **Install Netlify CLI**
+   ```bash
+   npm install -g netlify-cli
+   ```
+
+2. **Login ke Netlify**
+   ```bash
+   netlify login
+   ```
+
+3. **Deploy**
+   ```bash
+   # Di folder FE
+   cd FE
+   netlify deploy --prod
+   ```
+
+### Konfigurasi
+
+File `netlify.toml` sudah dikonfigurasi dengan:
+- Build command: `npm run build`
+- Publish directory: `.next` (akan di-handle oleh plugin)
+- Next.js plugin: `@netlify/plugin-nextjs` (otomatis diinstall saat build)
+- Node version: 18
+
+### Environment Variables
+
+Untuk production, pastikan set environment variable di Netlify Dashboard:
+- `NEXT_PUBLIC_API_URL` (optional, default: `https://be-store-profile.vercel.app/api`)
+
+### Catatan
+
+- Netlify akan otomatis menginstall `@netlify/plugin-nextjs` saat build
+- Plugin ini menangani Next.js routing, middleware, dan optimizations
+- Build time biasanya 2-5 menit tergantung ukuran project
