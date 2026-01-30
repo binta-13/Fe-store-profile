@@ -27,6 +27,7 @@ import {
 import api from '@/lib/api';
 import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { normalizeImageUrl } from '@/lib/utils';
 
 interface Product {
   id: string;
@@ -152,7 +153,7 @@ export default function ProductsPage() {
                         {product.images && product.images.length > 0 ? (
                           <div className="relative w-16 h-16 rounded-md overflow-hidden">
                             <Image
-                              src={product.images[0]}
+                              src={normalizeImageUrl(product.images[0])}
                               alt={product.name}
                               fill
                               className="object-cover"

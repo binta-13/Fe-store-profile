@@ -24,9 +24,9 @@ npm install
 cp .env.local.example .env.local
 ```
 
-3. Update `.env.local` dengan URL API backend Anda:
+3. Update `.env.local` dengan URL API backend Anda (optional, default sudah menggunakan production API):
 ```
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_API_URL=https://be-store-profile.vercel.app/api
 ```
 
 4. Jalankan development server:

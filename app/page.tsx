@@ -6,6 +6,7 @@ import Image from 'next/image';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { normalizeImageUrl } from '@/lib/utils';
 import { 
   MapPin, 
   Phone, 
@@ -92,7 +93,7 @@ export default function Home() {
   // Get product image (gunakan images[0] jika ada, atau fallback)
   const getProductImage = (product: Product) => {
     if (product.images && product.images.length > 0) {
-      return product.images[0];
+      return normalizeImageUrl(product.images[0]);
     }
     return '/images/Kurma kanan.jpg'; // fallback image
   };

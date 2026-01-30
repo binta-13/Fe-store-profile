@@ -27,6 +27,7 @@ import {
 import api from '@/lib/api';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { normalizeImageUrl } from '@/lib/utils';
 
 interface Promo {
   id: string;
@@ -160,7 +161,7 @@ export default function PromosPage() {
                         {promo.image ? (
                           <div className="relative w-16 h-16 rounded-md overflow-hidden">
                             <Image
-                              src={promo.image}
+                              src={normalizeImageUrl(promo.image)}
                               alt={promo.name}
                               fill
                               className="object-cover"
