@@ -41,18 +41,18 @@ export default function LoginPage() {
         const { token, user: userData } = response.data.data;
         Cookies.set('token', token, { expires: 7 });
         
-        // Redirect based on role immediately after login
+        // Redirect based on role with page reload for admin
         if (userData?.role === 'admin' || userData?.role === 'sub_admin') {
-          router.push('/admin/dashboard');
+          window.location.href = '/admin/dashboard';
         } else {
           router.push('/');
+          setLoading(false);
         }
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed');
-    } finally {
       setLoading(false);
     }
   };

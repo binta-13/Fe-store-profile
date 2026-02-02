@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost', 'be-store-profile.vercel.app'],
+    domains: ['localhost', 'be-store-profile.vercel.app', 'res.cloudinary.com'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -14,6 +14,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'be-store-profile.vercel.app',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
       },
     ],
   },
