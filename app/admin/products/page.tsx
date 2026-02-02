@@ -151,12 +151,13 @@ export default function ProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell>
                         {product.images && product.images.length > 0 ? (
-                          <div className="relative w-16 h-16 rounded-md overflow-hidden">
+                          <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100">
                             <Image
                               src={normalizeImageUrl(product.images[0])}
                               alt={product.name}
-                              fill
-                              className="object-cover"
+                              width={64}
+                              height={64}
+                              className="object-cover rounded-md"
                               unoptimized
                             />
                           </div>
