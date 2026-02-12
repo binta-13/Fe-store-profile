@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { normalizeImageUrl } from '@/lib/utils';
 import { 
@@ -26,13 +25,11 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   // Extract unique categories from products, dengan fallback ke kategori default
   const defaultCategories = ['Semua', 'Makanan', 'Minuman', 'Hampers'];
@@ -87,42 +84,6 @@ export default function ProductsPage() {
     return '/images/Kurma kanan.jpg'; // fallback image
   };
 
-  // Handle checkout
-  const handleCheckout = async (product: Product) => {
-    try {
-      setCheckoutLoading(product.id);
-      
-      // Gunakan data dari user context atau fallback ke default
-      const customerName = user?.displayName || user?.email?.split('@')[0] || 'Customer';
-      const customerPhone = user?.phone || '081234567890'; // Default phone untuk anonymous user
-      
-      const response = await api.post('/checkout', {
-        productId: product.id,
-        quantity: 1,
-        customerName: customerName,
-        customerPhone: customerPhone,
-      });
-
-      if (response.data.success && response.data.data?.whatsappUrl) {
-        // Buka WhatsApp link di tab baru
-        window.open(response.data.data.whatsappUrl, '_blank');
-      } else {
-        alert('Gagal membuat checkout link');
-      }
-    } catch (err: any) {
-      console.error('Error checkout:', err);
-      const errorMessage = err.response?.data?.message || 'Gagal melakukan checkout';
-      
-      // Jika error karena validasi, tampilkan pesan yang lebih jelas
-      if (err.response?.data?.errors) {
-        alert(err.response.data.errors.join(', '));
-      } else {
-        alert(errorMessage);
-      }
-    } finally {
-      setCheckoutLoading(null);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -261,7 +222,8 @@ export default function ProductsPage() {
                   {filteredProducts.map((product) => (
                     <div 
                       key={product.id} 
-                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer"
+                      onClick={() => router.push(`/products/${product.id}`)}
                     >
                       <div className="relative h-40 md:h-48 bg-gray-100">
                         <Image 
@@ -271,20 +233,22 @@ export default function ProductsPage() {
                           className="object-cover"
                         />
                       </div>
-                      <div className="p-3 md:p-4">
+                      <div className="p-3 md:p-4 flex flex-col flex-1">
                         <h3 className="font-bold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">{product.name}</h3>
-                        <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-2">
+                        <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-3 flex-1">
                           {product.description || 'Produk berkualitas tinggi'}
                         </p>
                         <p className="font-bold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
                           {formatPrice(product.price)}
                         </p>
                         <Button 
-                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2"
-                          onClick={() => handleCheckout(product)}
-                          disabled={checkoutLoading === product.id}
+                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2 mt-auto"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/products/${product.id}`);
+                          }}
                         >
-                          {checkoutLoading === product.id ? 'Memproses...' : 'Beli'}
+                          Beli
                         </Button>
                       </div>
                     </div>
