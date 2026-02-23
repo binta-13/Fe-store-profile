@@ -112,16 +112,18 @@ export default function PromoForm({
     }));
   };
 
-  const handleMultiSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, options } = e.target;
-    const selectedValues = Array.from(options)
-      .filter((option) => option.selected)
-      .map((option) => option.value);
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedValues,
-    }));
+  const toggleIdInArray = (field: 'productIds' | 'categoryIds', id: string) => {
+    setFormData((prev) => {
+      const current = prev[field];
+      const exists = current.includes(id);
+      const next = exists
+        ? current.filter((value) => value !== id)
+        : [...current, id];
+      return {
+        ...prev,
+        [field]: next,
+      };
+    });
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -292,28 +294,32 @@ export default function PromoForm({
                 </p>
               ) : (
                 <>
-                  <select
-                    id="productIds"
-                    name="productIds"
-                    aria-label="Pilih produk promo"
-                    multiple
-                    value={formData.productIds}
-                    onChange={handleMultiSelectChange}
-                    disabled={loading}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
+                  <div className="space-y-2 rounded-md border border-input p-3 max-h-60 overflow-auto">
                     {products.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                        {product.price
-                          ? ` - Rp ${product.price.toLocaleString('id-ID')}`
-                          : ''}
-                      </option>
+                      <label
+                        key={product.id}
+                        className="flex items-center space-x-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300"
+                          disabled={loading}
+                          checked={formData.productIds.includes(product.id)}
+                          onChange={() =>
+                            toggleIdInArray('productIds', product.id)
+                          }
+                        />
+                        <span>
+                          {product.name}
+                          {product.price
+                            ? ` - Rp ${product.price.toLocaleString('id-ID')}`
+                            : ''}
+                        </span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Tekan Ctrl (Windows) atau Command (Mac) untuk memilih lebih
-                    dari satu produk.
+                    Centang produk yang ingin diberi promo.
                   </p>
                 </>
               )}
@@ -328,35 +334,52 @@ export default function PromoForm({
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                <>
-                  <select
-                    id="categoryIds"
-                    name="categoryIds"
-                    aria-label="Pilih kategori promo"
-                    multiple
-                    value={formData.categoryIds}
-                    onChange={handleMultiSelectChange}
-                    disabled={loading}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {Array.from(
-                      new Set(
-                        products
-                          .map((product) => product.category)
-                          .filter((category): category is string =>
-                            Boolean(category),
-                          ),
-                      ),
-                    ).map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-muted-foreground">
-                    Kategori diambil dari data produk yang sudah ada.
-                  </p>
-                </>
+                (() => {
+                  const categories = Array.from(
+                    new Set(
+                      products
+                        .map((product) => product.category)
+                        .filter((category): category is string =>
+                          Boolean(category),
+                        ),
+                    ),
+                  );
+
+                  if (categories.length === 0) {
+                    return (
+                      <p className="text-sm text-muted-foreground">
+                        Belum ada kategori pada produk yang tersedia.
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <>
+                      <div className="space-y-2 rounded-md border border-input p-3 max-h-60 overflow-auto">
+                        {categories.map((category) => (
+                          <label
+                            key={category}
+                            className="flex items-center space-x-2 text-sm"
+                          >
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300"
+                              disabled={loading}
+                              checked={formData.categoryIds.includes(category)}
+                              onChange={() =>
+                                toggleIdInArray('categoryIds', category)
+                              }
+                            />
+                            <span>{category}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Kategori diambil dari data produk yang sudah ada.
+                      </p>
+                    </>
+                  );
+                })()
               )}
             </div>
           )}
