@@ -258,6 +258,7 @@ export default function UsersPage() {
                     <Label htmlFor="edit-role">Role</Label>
                     <select
                       id="edit-role"
+                      title="Pilih role user"
                       value={formData.role}
                       onChange={(e) =>
                         setFormData({ ...formData, role: e.target.value })

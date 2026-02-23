@@ -8,13 +8,13 @@ import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { normalizeImageUrl } from '@/lib/utils';
-import { 
-  MapPin, 
-  Phone, 
-  Clock, 
+import {
+  MapPin,
+  Phone,
+  Clock,
   MessageCircle,
   ArrowLeft,
-  ShoppingCart
+  ShoppingCart,
 } from 'lucide-react';
 
 interface Product {
@@ -31,6 +31,23 @@ interface Product {
   dimensions?: string;
 }
 
+interface Promo {
+  id: string;
+  name: string;
+  description?: string;
+  discount: number;
+  discountType?: 'percentage' | 'fixed';
+  minPurchase?: number;
+  maxDiscount?: number | null;
+  code?: string;
+  startDate?: string;
+  endDate?: string | null;
+  isActive?: boolean;
+  appliesTo?: 'all' | 'products' | 'categories';
+  productIds?: string[];
+  categoryIds?: string[];
+}
+
 export default function ProductDetailPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -42,29 +59,63 @@ export default function ProductDetailPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [promos, setPromos] = useState<Promo[]>([]);
 
   useEffect(() => {
-    fetchProduct();
-  }, [productId]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get(`/products/${productId}`);
-      
-      if (response.data.success) {
-        setProduct(response.data.data);
-      } else {
-        setError('Produk tidak ditemukan');
+        const [productResponse, promosResponse] = await Promise.all([
+          api.get(`/products/${productId}`),
+          api.get('/promos'),
+        ]);
+
+        if (productResponse.data.success) {
+          setProduct(productResponse.data.data);
+        } else {
+          setError('Produk tidak ditemukan');
+        }
+
+        if (promosResponse.data.success) {
+          const now = new Date();
+          const activePromos = promosResponse.data.data.filter(
+            (promo: Promo) => {
+              if (promo.isActive === false) {
+                return false;
+              }
+
+              if (promo.startDate) {
+                const start = new Date(promo.startDate);
+                if (now < start) {
+                  return false;
+                }
+              }
+
+              if (promo.endDate) {
+                const end = new Date(promo.endDate);
+                if (now > end) {
+                  return false;
+                }
+              }
+
+              return true;
+            },
+          );
+
+          setPromos(activePromos);
+        }
+      } catch (err: any) {
+        console.error('Error fetching product:', err);
+        setError(err.response?.data?.message || 'Gagal mengambil data produk');
+      } finally {
+        setLoading(false);
       }
-    } catch (err: any) {
-      console.error('Error fetching product:', err);
-      setError(err.response?.data?.message || 'Gagal mengambil data produk');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, [productId]);
 
   // Format price ke Rupiah
   const formatPrice = (price: number) => {
@@ -78,21 +129,104 @@ export default function ProductDetailPage() {
   // Get product images
   const getProductImages = () => {
     if (product?.images && product.images.length > 0) {
-      return product.images.map(img => normalizeImageUrl(img));
+      return product.images.map((img) => normalizeImageUrl(img));
     }
     return ['/images/Kurma kanan.jpg']; // fallback image
+  };
+
+  const getDiscountAmount = (price: number, promo: Promo) => {
+    if (!promo.discount || promo.discount <= 0) {
+      return 0;
+    }
+
+    if (promo.minPurchase && price < promo.minPurchase) {
+      return 0;
+    }
+
+    if (promo.discountType === 'fixed') {
+      return Math.min(promo.discount, price);
+    }
+
+    const percentageDiscount = (price * promo.discount) / 100;
+
+    if (promo.maxDiscount != null) {
+      return Math.min(percentageDiscount, promo.maxDiscount);
+    }
+
+    return percentageDiscount;
+  };
+
+  const isPromoApplicableToProduct = (productData: Product, promo: Promo) => {
+    if (!promo.appliesTo || promo.appliesTo === 'all') {
+      return true;
+    }
+
+    if (promo.appliesTo === 'products' && promo.productIds) {
+      return promo.productIds.includes(productData.id);
+    }
+
+    if (
+      promo.appliesTo === 'categories' &&
+      promo.categoryIds &&
+      productData.category
+    ) {
+      return promo.categoryIds.includes(productData.category);
+    }
+
+    return false;
+  };
+
+  type BestPromoResult = {
+    promo: Promo;
+    discountAmount: number;
+    finalPrice: number;
+  };
+
+  const getBestPromoForProduct = (
+    productData: Product | null,
+  ): BestPromoResult | null => {
+    if (!productData) {
+      return null;
+    }
+
+    let bestPromo: Promo | null = null;
+    let bestDiscount = 0;
+
+    promos.forEach((promo) => {
+      if (!isPromoApplicableToProduct(productData, promo)) {
+        return;
+      }
+
+      const discountAmount = getDiscountAmount(productData.price, promo);
+
+      if (discountAmount > bestDiscount) {
+        bestDiscount = discountAmount;
+        bestPromo = promo;
+      }
+    });
+
+    if (!bestPromo || bestDiscount <= 0) {
+      return null;
+    }
+
+    return {
+      promo: bestPromo,
+      discountAmount: bestDiscount,
+      finalPrice: Math.max(0, productData.price - bestDiscount),
+    };
   };
 
   // Handle checkout
   const handleCheckout = async () => {
     if (!product) return;
-    
+
     try {
       setCheckoutLoading(true);
-      
-      const customerName = user?.displayName || user?.email?.split('@')[0] || 'Customer';
+
+      const customerName =
+        user?.displayName || user?.email?.split('@')[0] || 'Customer';
       const customerPhone = user?.phone || '081234567890';
-      
+
       const response = await api.post('/checkout', {
         productId: product.id,
         quantity: quantity,
@@ -107,8 +241,9 @@ export default function ProductDetailPage() {
       }
     } catch (err: any) {
       console.error('Error checkout:', err);
-      const errorMessage = err.response?.data?.message || 'Gagal melakukan checkout';
-      
+      const errorMessage =
+        err.response?.data?.message || 'Gagal melakukan checkout';
+
       if (err.response?.data?.errors) {
         alert(err.response.data.errors.join(', '));
       } else {
@@ -127,13 +262,28 @@ export default function ProductDetailPage() {
         <header className="bg-dark-blue text-white">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/products" className="text-2xl font-bold hover:text-gray-300 transition">
+              <Link
+                href="/products"
+                className="text-2xl font-bold hover:text-gray-300 transition"
+              >
                 SUPERFOOD SRAGEN
               </Link>
               <nav className="flex gap-6">
-                <Link href="/" className="hover:text-gray-300 transition">BERANDA</Link>
-                <Link href="/products" className="hover:text-gray-300 transition font-semibold">PRODUK</Link>
-                <Link href="/contact" className="hover:text-gray-300 transition">KONTAK</Link>
+                <Link href="/" className="hover:text-gray-300 transition">
+                  BERANDA
+                </Link>
+                <Link
+                  href="/products"
+                  className="hover:text-gray-300 transition font-semibold"
+                >
+                  PRODUK
+                </Link>
+                <Link
+                  href="/contact"
+                  className="hover:text-gray-300 transition"
+                >
+                  KONTAK
+                </Link>
               </nav>
             </div>
           </div>
@@ -151,20 +301,37 @@ export default function ProductDetailPage() {
         <header className="bg-dark-blue text-white">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/products" className="text-2xl font-bold hover:text-gray-300 transition">
+              <Link
+                href="/products"
+                className="text-2xl font-bold hover:text-gray-300 transition"
+              >
                 SUPERFOOD SRAGEN
               </Link>
               <nav className="flex gap-6">
-                <Link href="/" className="hover:text-gray-300 transition">BERANDA</Link>
-                <Link href="/products" className="hover:text-gray-300 transition font-semibold">PRODUK</Link>
-                <Link href="/contact" className="hover:text-gray-300 transition">KONTAK</Link>
+                <Link href="/" className="hover:text-gray-300 transition">
+                  BERANDA
+                </Link>
+                <Link
+                  href="/products"
+                  className="hover:text-gray-300 transition font-semibold"
+                >
+                  PRODUK
+                </Link>
+                <Link
+                  href="/contact"
+                  className="hover:text-gray-300 transition"
+                >
+                  KONTAK
+                </Link>
               </nav>
             </div>
           </div>
         </header>
         <div className="container mx-auto px-4 py-16 text-center">
-          <p className="text-red-600 mb-4">{error || 'Produk tidak ditemukan'}</p>
-          <Button 
+          <p className="text-red-600 mb-4">
+            {error || 'Produk tidak ditemukan'}
+          </p>
+          <Button
             onClick={() => router.push('/products')}
             className="bg-brand-red hover:bg-brand-red/90 text-white"
           >
@@ -181,13 +348,25 @@ export default function ProductDetailPage() {
       <header className="bg-dark-blue text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/products" className="text-2xl font-bold hover:text-gray-300 transition">
+            <Link
+              href="/products"
+              className="text-2xl font-bold hover:text-gray-300 transition"
+            >
               SUPERFOOD SRAGEN
             </Link>
             <nav className="flex gap-6">
-              <Link href="/" className="hover:text-gray-300 transition">BERANDA</Link>
-              <Link href="/products" className="hover:text-gray-300 transition font-semibold">PRODUK</Link>
-              <Link href="/contact" className="hover:text-gray-300 transition">KONTAK</Link>
+              <Link href="/" className="hover:text-gray-300 transition">
+                BERANDA
+              </Link>
+              <Link
+                href="/products"
+                className="hover:text-gray-300 transition font-semibold"
+              >
+                PRODUK
+              </Link>
+              <Link href="/contact" className="hover:text-gray-300 transition">
+                KONTAK
+              </Link>
             </nav>
           </div>
         </div>
@@ -219,12 +398,13 @@ export default function ProductDetailPage() {
                   priority
                 />
               </div>
-              
+
               {/* Thumbnail Images */}
               {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-4">
                   {images.map((img, index) => (
                     <button
+                      title={`Gambar ${index + 1}`}
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
                       className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
@@ -260,14 +440,39 @@ export default function ProductDetailPage() {
               </h1>
 
               {/* Price */}
-              <div className="text-3xl md:text-4xl font-bold text-brand-red">
-                {formatPrice(product.price)}
-              </div>
+              {(() => {
+                const best = getBestPromoForProduct(product);
+                if (!best) {
+                  return (
+                    <div className="text-3xl md:text-4xl font-bold text-brand-red">
+                      {formatPrice(product.price)}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-semibold">
+                      Promo: {best.promo.name}
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-lg text-gray-500 line-through">
+                        {formatPrice(product.price)}
+                      </span>
+                      <span className="text-3xl md:text-4xl font-bold text-brand-red">
+                        {formatPrice(best.finalPrice)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Description */}
               {product.description && (
                 <div className="space-y-2">
-                  <h2 className="text-xl font-semibold text-gray-900">Deskripsi Produk</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Deskripsi Produk
+                  </h2>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                     {product.description}
                   </p>
@@ -297,8 +502,12 @@ export default function ProductDetailPage() {
                 {product.stock !== undefined && (
                   <div className="flex">
                     <span className="text-gray-600 w-32">Stok:</span>
-                    <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {product.stock > 0 ? `Tersedia (${product.stock})` : 'Habis'}
+                    <span
+                      className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {product.stock > 0
+                        ? `Tersedia (${product.stock})`
+                        : 'Habis'}
                     </span>
                   </div>
                 )}
@@ -318,6 +527,7 @@ export default function ProductDetailPage() {
                   <input
                     type="number"
                     min="1"
+                    title="Masukkan jumlah produk yang ingin dibeli"
                     value={quantity}
                     onChange={(e) => {
                       const val = parseInt(e.target.value) || 1;
@@ -335,16 +545,25 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Total Price */}
-              <div className="text-xl font-bold text-gray-900 pt-2">
-                Total: {formatPrice(product.price * quantity)}
-              </div>
+              {(() => {
+                const best = getBestPromoForProduct(product);
+                const unitPrice = best ? best.finalPrice : product.price;
+                return (
+                  <div className="text-xl font-bold text-gray-900 pt-2">
+                    Total: {formatPrice(unitPrice * quantity)}
+                  </div>
+                );
+              })()}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
                   className="flex-1 bg-brand-red hover:bg-brand-red/90 text-white py-6 text-lg"
                   onClick={handleCheckout}
-                  disabled={checkoutLoading || (product.stock !== undefined && product.stock === 0)}
+                  disabled={
+                    checkoutLoading ||
+                    (product.stock !== undefined && product.stock === 0)
+                  }
                 >
                   {checkoutLoading ? (
                     'Memproses...'
@@ -376,28 +595,33 @@ export default function ProductDetailPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">Hubungi Kami</h2>
           <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Temukan berbagai produk superfood berkualitas dan dapatkan informasi serta pemesanan melalui WhatsApp dan Instagram resmi Superfood Sragen.
+            Temukan berbagai produk superfood berkualitas dan dapatkan informasi
+            serta pemesanan melalui WhatsApp dan Instagram resmi Superfood
+            Sragen.
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <MapPin className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Lokasi</h3>
               <p className="text-gray-200 text-sm">
-                Turi, RT.004/RW.004, Gumantar, Kec. Mojoagung, Kabupaten Sragen, Jawa Tengah 57271
+                Turi, RT.004/RW.004, Gumantar, Kec. Mojoagung, Kabupaten Sragen,
+                Jawa Tengah 57271
               </p>
             </div>
-            
+
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <Phone className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Hubungi Kami</h3>
               <p className="text-gray-200 text-sm">0822-2001-8781</p>
             </div>
-            
+
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <Clock className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">Senin - Minggu 08.00 - 18.00</p>
+              <p className="text-gray-200 text-sm">
+                Senin - Minggu 08.00 - 18.00
+              </p>
             </div>
           </div>
         </div>
@@ -406,7 +630,9 @@ export default function ProductDetailPage() {
       {/* Footer */}
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300">© 2024 SUPERFOOD SRAGEN. All rights reserved.</p>
+          <p className="text-gray-300">
+            © 2024 SUPERFOOD SRAGEN. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

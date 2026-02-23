@@ -24,12 +24,30 @@ interface Product {
   isActive?: boolean;
 }
 
+interface Promo {
+  id: string;
+  name: string;
+  description?: string;
+  discount: number;
+  discountType?: 'percentage' | 'fixed';
+  minPurchase?: number;
+  maxDiscount?: number | null;
+  code?: string;
+  startDate?: string;
+  endDate?: string | null;
+  isActive?: boolean;
+  appliesTo?: 'all' | 'products' | 'categories';
+  productIds?: string[];
+  categoryIds?: string[];
+}
+
 export default function ProductsPage() {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [promos, setPromos] = useState<Promo[]>([]);
 
   // Extract unique categories from products, dengan fallback ke kategori default
   const defaultCategories = ['Semua', 'Makanan', 'Minuman', 'Hampers'];
@@ -37,30 +55,60 @@ export default function ProductsPage() {
   const categories = productCategories.length > 1 ? productCategories : defaultCategories;
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get('/products');
-        
-        if (response.data.success) {
-          // Filter hanya produk yang aktif
-          const activeProducts = response.data.data.filter((product: Product) => 
-            product.isActive !== false
+
+        const [productsResponse, promosResponse] = await Promise.all([
+          api.get('/products'),
+          api.get('/promos'),
+        ]);
+
+        if (productsResponse.data.success) {
+          const activeProducts = productsResponse.data.data.filter(
+            (product: Product) => product.isActive !== false,
           );
           setProducts(activeProducts);
         } else {
           setError('Gagal mengambil data produk');
         }
+
+        if (promosResponse.data.success) {
+          const now = new Date();
+          const activePromos = promosResponse.data.data.filter((promo: Promo) => {
+            if (promo.isActive === false) {
+              return false;
+            }
+
+            if (promo.startDate) {
+              const start = new Date(promo.startDate);
+              if (now < start) {
+                return false;
+              }
+            }
+
+            if (promo.endDate) {
+              const end = new Date(promo.endDate);
+              if (now > end) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
+          setPromos(activePromos);
+        }
       } catch (err: any) {
-        console.error('Error fetching products:', err);
+        console.error('Error fetching data:', err);
         setError(err.response?.data?.message || 'Gagal mengambil data produk');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
   const filteredProducts = activeCategory === 'Semua' 
@@ -82,6 +130,78 @@ export default function ProductsPage() {
       return normalizeImageUrl(product.images[0]);
     }
     return '/images/Kurma kanan.jpg'; // fallback image
+  };
+
+  const getDiscountAmount = (price: number, promo: Promo) => {
+    if (!promo.discount || promo.discount <= 0) {
+      return 0;
+    }
+
+    if (promo.minPurchase && price < promo.minPurchase) {
+      return 0;
+    }
+
+    if (promo.discountType === 'fixed') {
+      return Math.min(promo.discount, price);
+    }
+
+    const percentageDiscount = (price * promo.discount) / 100;
+
+    if (promo.maxDiscount != null) {
+      return Math.min(percentageDiscount, promo.maxDiscount);
+    }
+
+    return percentageDiscount;
+  };
+
+  const isPromoApplicableToProduct = (product: Product, promo: Promo) => {
+    if (!promo.appliesTo || promo.appliesTo === 'all') {
+      return true;
+    }
+
+    if (promo.appliesTo === 'products' && promo.productIds) {
+      return promo.productIds.includes(product.id);
+    }
+
+    if (promo.appliesTo === 'categories' && promo.categoryIds && product.category) {
+      return promo.categoryIds.includes(product.category);
+    }
+
+    return false;
+  };
+
+  type BestPromoResult = {
+    promo: Promo;
+    discountAmount: number;
+    finalPrice: number;
+  };
+
+  const getBestPromoForProduct = (product: Product): BestPromoResult | null => {
+    let bestPromo: Promo | null = null;
+    let bestDiscount = 0;
+
+    promos.forEach((promo) => {
+      if (!isPromoApplicableToProduct(product, promo)) {
+        return;
+      }
+
+      const discountAmount = getDiscountAmount(product.price, promo);
+
+      if (discountAmount > bestDiscount) {
+        bestDiscount = discountAmount;
+        bestPromo = promo;
+      }
+    });
+
+    if (!bestPromo || bestDiscount <= 0) {
+      return null;
+    }
+
+    return {
+      promo: bestPromo,
+      discountAmount: bestDiscount,
+      finalPrice: Math.max(0, product.price - bestDiscount),
+    };
   };
 
 
@@ -238,9 +358,32 @@ export default function ProductsPage() {
                         <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-3 flex-1">
                           {product.description || 'Produk berkualitas tinggi'}
                         </p>
-                        <p className="font-bold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
-                          {formatPrice(product.price)}
-                        </p>
+                        {(() => {
+                          const best = getBestPromoForProduct(product);
+                          if (!best) {
+                            return (
+                              <p className="font-bold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
+                                {formatPrice(product.price)}
+                              </p>
+                            );
+                          }
+
+                          return (
+                            <div className="mb-2 md:mb-3">
+                              <p className="text-xs font-semibold text-green-700 mb-1">
+                                Promo: {best.promo.name}
+                              </p>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-xs md:text-sm text-gray-500 line-through">
+                                  {formatPrice(product.price)}
+                                </span>
+                                <span className="font-bold text-brand-red text-sm md:text-base">
+                                  {formatPrice(best.finalPrice)}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                         <Button 
                           className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2 mt-auto"
                           onClick={(e) => {

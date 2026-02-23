@@ -126,6 +126,7 @@ export default function CheckoutPage() {
                       <select
                         id="productId"
                         name="productId"
+                        title="Pilih produk yang akan dibeli"
                         value={formData.productId}
                         onChange={handleChange}
                         required

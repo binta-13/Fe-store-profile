@@ -238,6 +238,7 @@ export default function ProductForm({ initialData, onSubmit, loading }: ProductF
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
+              title="Pilih apakah produk akan aktif atau tidak"
               id="isActive"
               name="isActive"
               checked={formData.isActive}
