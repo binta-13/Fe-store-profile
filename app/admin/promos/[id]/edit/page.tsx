@@ -20,6 +20,9 @@ interface Promo {
   endDate?: string;
   isActive?: boolean;
   image?: string;
+  appliesTo?: 'all' | 'products' | 'categories';
+  productIds?: string[];
+  categoryIds?: string[];
 }
 
 export default function EditPromoPage() {
@@ -122,6 +125,9 @@ export default function EditPromoPage() {
               endDate: formatDateForInput(promo.endDate),
               isActive: promo.isActive !== false,
               image: promo.image || '',
+              appliesTo: promo.appliesTo || 'all',
+              productIds: promo.productIds || [],
+              categoryIds: promo.categoryIds || [],
             }}
             onSubmit={handleSubmit}
             loading={loading}

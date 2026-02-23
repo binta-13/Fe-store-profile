@@ -5,9 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import Image from 'next/image';
 import { X, Image as ImageIcon } from 'lucide-react';
+import api from '@/lib/api';
 
 interface PromoFormData {
   name: string;
@@ -21,6 +28,9 @@ interface PromoFormData {
   endDate: string;
   isActive: boolean;
   image: string;
+  appliesTo: 'all' | 'products' | 'categories';
+  productIds: string[];
+  categoryIds: string[];
 }
 
 interface PromoFormProps {
@@ -29,7 +39,18 @@ interface PromoFormProps {
   loading?: boolean;
 }
 
-export default function PromoForm({ initialData, onSubmit, loading }: PromoFormProps) {
+interface ProductOption {
+  id: string;
+  name: string;
+  price?: number;
+  category?: string;
+}
+
+export default function PromoForm({
+  initialData,
+  onSubmit,
+  loading,
+}: PromoFormProps) {
   const [formData, setFormData] = useState<PromoFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -42,13 +63,64 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
     endDate: initialData?.endDate || '',
     isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
     image: initialData?.image || '',
+    appliesTo: initialData?.appliesTo || 'all',
+    productIds: initialData?.productIds || [],
+    categoryIds: initialData?.categoryIds || [],
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const [products, setProducts] = useState<ProductOption[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setProductsLoading(true);
+        const response = await api.get('/products');
+        if (response.data.success) {
+          setProducts(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching products for promo form:', error);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
+
+    if (name === 'appliesTo') {
+      setFormData((prev) => ({
+        ...prev,
+        appliesTo: value as 'all' | 'products' | 'categories',
+        productIds: value === 'products' ? prev.productIds : [],
+        categoryIds: value === 'categories' ? prev.categoryIds : [],
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleMultiSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, options } = e.target;
+    const selectedValues = Array.from(options)
+      .filter((option) => option.selected)
+      .map((option) => option.value);
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: selectedValues,
     }));
   };
 
@@ -66,8 +138,12 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
     const submitData = {
       ...formData,
       discount: parseFloat(formData.discount),
-      minPurchase: formData.minPurchase ? parseFloat(formData.minPurchase) : undefined,
-      maxDiscount: formData.maxDiscount ? parseFloat(formData.maxDiscount) : undefined,
+      minPurchase: formData.minPurchase
+        ? parseFloat(formData.minPurchase)
+        : undefined,
+      maxDiscount: formData.maxDiscount
+        ? parseFloat(formData.maxDiscount)
+        : undefined,
     };
 
     await onSubmit(submitData);
@@ -123,6 +199,7 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
               <select
                 id="discountType"
                 name="discountType"
+                aria-label="Tipe diskon"
                 value={formData.discountType}
                 onChange={handleInputChange}
                 required
@@ -148,7 +225,9 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
                 onChange={handleInputChange}
                 required
                 disabled={loading}
-                placeholder={formData.discountType === 'percentage' ? '10' : '50000'}
+                placeholder={
+                  formData.discountType === 'percentage' ? '10' : '50000'
+                }
               />
             </div>
 
@@ -182,6 +261,105 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
               disabled={loading}
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="appliesTo">Berlaku Untuk</Label>
+            <select
+              id="appliesTo"
+              name="appliesTo"
+              aria-label="Berlaku untuk"
+              value={formData.appliesTo}
+              onChange={handleInputChange}
+              disabled={loading}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Semua Produk</option>
+              <option value="products">Produk Tertentu</option>
+              <option value="categories">Kategori Tertentu</option>
+            </select>
+          </div>
+
+          {formData.appliesTo === 'products' && (
+            <div className="space-y-2">
+              <Label htmlFor="productIds">Pilih Produk</Label>
+              {productsLoading ? (
+                <div className="h-10 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                </div>
+              ) : products.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Belum ada produk. Tambahkan produk terlebih dahulu.
+                </p>
+              ) : (
+                <>
+                  <select
+                    id="productIds"
+                    name="productIds"
+                    aria-label="Pilih produk promo"
+                    multiple
+                    value={formData.productIds}
+                    onChange={handleMultiSelectChange}
+                    disabled={loading}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                        {product.price
+                          ? ` - Rp ${product.price.toLocaleString('id-ID')}`
+                          : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    Tekan Ctrl (Windows) atau Command (Mac) untuk memilih lebih
+                    dari satu produk.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
+          {formData.appliesTo === 'categories' && (
+            <div className="space-y-2">
+              <Label htmlFor="categoryIds">Pilih Kategori</Label>
+              {productsLoading ? (
+                <div className="h-10 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <>
+                  <select
+                    id="categoryIds"
+                    name="categoryIds"
+                    aria-label="Pilih kategori promo"
+                    multiple
+                    value={formData.categoryIds}
+                    onChange={handleMultiSelectChange}
+                    disabled={loading}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    {Array.from(
+                      new Set(
+                        products
+                          .map((product) => product.category)
+                          .filter((category): category is string =>
+                            Boolean(category),
+                          ),
+                      ),
+                    ).map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    Kategori diambil dari data produk yang sudah ada.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -238,6 +416,7 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
               type="checkbox"
               id="isActive"
               name="isActive"
+              title="Promo Aktif"
               checked={formData.isActive}
               onChange={handleCheckboxChange}
               disabled={loading}
@@ -266,4 +445,3 @@ export default function PromoForm({ initialData, onSubmit, loading }: PromoFormP
     </form>
   );
 }
-
