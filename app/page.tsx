@@ -6,16 +6,16 @@ import Image from 'next/image';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { normalizeImageUrl } from '@/lib/utils';
-import { 
-  MapPin, 
-  Phone, 
-  Clock, 
+import {
+  MapPin,
+  Phone,
+  Clock,
   MessageCircle,
   ShoppingBag,
   Users,
   Package,
   MapPin as LocationIcon,
-  ThumbsUp
+  ThumbsUp,
 } from 'lucide-react';
 
 interface Product {
@@ -35,17 +35,28 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [storePhone, setStorePhone] = useState<string>('');
+
   const heroImages = [
-    '/images/Kurma Slider 1.jpg',
-    '/images/Hampers Slider 2.jpg',
-    '/images/Kurma kanan.jpg',
+    '/images/Kurma_Slider_1.png',
+    '/images/Hampers_Slider_2.png',
+    '/images/Kurma_kanan.png',
   ];
 
   // Extract unique categories from products, dengan fallback ke kategori default
-  const defaultCategories = ['Semua', 'Makanan', 'Minuman', 'Menu Sarapan', 'Hampers'];
-  const productCategories = ['Semua', ...new Set(products.map(p => p.category).filter(Boolean))] as string[];
-  const categories = productCategories.length > 1 ? productCategories : defaultCategories;
+  const defaultCategories = [
+    'Semua',
+    'Makanan',
+    'Minuman',
+    'Menu Sarapan',
+    'Hampers',
+  ];
+  const productCategories = [
+    'Semua',
+    ...new Set(products.map((p) => p.category).filter(Boolean)),
+  ] as string[];
+  const categories =
+    productCategories.length > 1 ? productCategories : defaultCategories;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,11 +64,11 @@ export default function Home() {
         setLoading(true);
         setError(null);
         const response = await api.get('/products');
-        
+
         if (response.data.success) {
           // Filter hanya produk yang aktif
-          const activeProducts = response.data.data.filter((product: Product) => 
-            product.isActive !== false
+          const activeProducts = response.data.data.filter(
+            (product: Product) => product.isActive !== false,
           );
           setProducts(activeProducts);
         } else {
@@ -74,9 +85,22 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  const filteredProducts = activeCategory === 'Semua' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+  useEffect(() => {
+    const fetchStoreProfile = async () => {
+      try {
+        const response = await api.get('/store-profile');
+        if (response.data?.success && response.data?.data?.phone) {
+          setStorePhone(response.data.data.phone);
+        }
+      } catch (err) {}
+    };
+    fetchStoreProfile();
+  }, []);
+
+  const filteredProducts =
+    activeCategory === 'Semua'
+      ? products
+      : products.filter((p) => p.category === activeCategory);
 
   // Format price ke Rupiah
   const formatPrice = (price: number) => {
@@ -95,6 +119,13 @@ export default function Home() {
     return '/images/Kurma kanan.jpg'; // fallback image
   };
 
+  const getWhatsAppUrl = () => {
+    let digits = (storePhone || '').replace(/\D/g, '');
+    if (!digits) return 'https://wa.me/';
+    if (digits.startsWith('0')) digits = `62${digits.slice(1)}`;
+    if (digits.startsWith('8')) digits = `62${digits}`;
+    return `https://wa.me/${digits}`;
+  };
 
   return (
     <div className="min-h-screen">
@@ -102,20 +133,22 @@ export default function Home() {
       <header className="bg-dark-blue text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">SUPERFOOD SINAGIN</h1>
+            <h1 className="text-2xl font-bold">SUPERFOOD SERAGEN</h1>
             <nav className="flex gap-6">
-              <a 
-                href="#beranda" 
+              <a
+                href="#beranda"
                 className="hover:text-gray-300 transition"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById('beranda')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById('beranda')
+                    ?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
                 BERANDA
               </a>
-              <a 
-                href="/products" 
+              <a
+                href="/products"
                 className="hover:text-gray-300 transition"
                 onClick={(e) => {
                   e.preventDefault();
@@ -124,8 +157,8 @@ export default function Home() {
               >
                 PRODUK
               </a>
-              <a 
-                href="/contact" 
+              <a
+                href="/contact"
                 className="hover:text-gray-300 transition"
                 onClick={(e) => {
                   e.preventDefault();
@@ -148,10 +181,11 @@ export default function Home() {
                 Pilihan SUPERFOOD Terbaik untuk Gaya Hidup Sehatmu
               </h2>
               <p className="text-lg mb-6 text-gray-200">
-                Menyediakan berbagai produk superfood pilihan untuk mendukung kesehatan dan nutrisi keluarga Anda
+                Menyediakan berbagai produk superfood pilihan untuk mendukung
+                kesehatan dan nutrisi keluarga Anda
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button 
+                <Button
                   className="bg-brand-red hover:bg-brand-red/90 text-white px-6 py-3 rounded-none"
                   onClick={() => {
                     router.push('/products');
@@ -159,8 +193,8 @@ export default function Home() {
                 >
                   Lihat Produk
                 </Button>
-                <a 
-                  href="https://wa.me/6281234567890" 
+                <a
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center text-white hover:text-gray-300 transition"
@@ -172,9 +206,9 @@ export default function Home() {
             </div>
             <div className="relative">
               <div className="relative h-96 rounded-lg overflow-hidden">
-                <Image 
-                  src={heroImages[heroSlideIndex]} 
-                  alt="Superfood products" 
+                <Image
+                  src={heroImages[heroSlideIndex]}
+                  alt="Superfood products"
                   fill
                   className="object-cover"
                   priority
@@ -200,8 +234,10 @@ export default function Home() {
       {/* Product Section */}
       <section id="produk" className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Produk Kami</h2>
-          
+          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
+            Produk Kami
+          </h2>
+
           {/* Category Tabs */}
           <div className="flex justify-center flex-wrap gap-4 mb-8">
             {categories.map((category) => (
@@ -230,7 +266,7 @@ export default function Home() {
           {error && !loading && (
             <div className="text-center py-12">
               <p className="text-red-600 mb-4">{error}</p>
-              <Button 
+              <Button
                 onClick={() => window.location.reload()}
                 className="bg-brand-red hover:bg-brand-red/90 text-white"
               >
@@ -244,33 +280,37 @@ export default function Home() {
             <>
               {filteredProducts.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-600">Tidak ada produk yang tersedia</p>
+                  <p className="text-gray-600">
+                    Tidak ada produk yang tersedia
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                   {filteredProducts.map((product) => (
-                    <div 
-                      key={product.id} 
+                    <div
+                      key={product.id}
                       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer"
                       onClick={() => router.push(`/products/${product.id}`)}
                     >
                       <div className="relative h-40 md:h-48 bg-gray-100">
-                        <Image 
-                          src={getProductImage(product)} 
+                        <Image
+                          src={getProductImage(product)}
                           alt={product.name}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="p-3 md:p-4 flex flex-col flex-1">
-                        <h3 className="font-bold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">{product.name}</h3>
+                        <h3 className="font-bold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">
+                          {product.name}
+                        </h3>
                         <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-3 flex-1">
                           {product.description || 'Produk berkualitas tinggi'}
                         </p>
                         <p className="font-bold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
                           {formatPrice(product.price)}
                         </p>
-                        <Button 
+                        <Button
                           className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2 mt-auto"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -294,15 +334,19 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-end relative">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900">Tentang Kami</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-900">
+                Tentang Kami
+              </h2>
               <div className="border-4 border-yellow-400 p-6 rounded-lg mb-6">
                 <p className="text-gray-700 leading-relaxed">
-                  Kami berkomitmen untuk menyediakan produk superfood berkualitas tinggi yang mendukung 
-                  gaya hidup sehat Anda dan keluarga. Dengan pengalaman bertahun-tahun, kami memastikan 
-                  setiap produk yang kami tawarkan adalah pilihan terbaik untuk kesehatan dan nutrisi Anda.
+                  Kami berkomitmen untuk menyediakan produk superfood
+                  berkualitas tinggi yang mendukung gaya hidup sehat Anda dan
+                  keluarga. Dengan pengalaman bertahun-tahun, kami memastikan
+                  setiap produk yang kami tawarkan adalah pilihan terbaik untuk
+                  kesehatan dan nutrisi Anda.
                 </p>
               </div>
-              
+
               <div className="flex flex-wrap gap-6 mb-6">
                 <div className="flex flex-col items-center">
                   <div className="w-20 h-20 rounded-full bg-dark-blue flex items-center justify-center mb-2">
@@ -327,11 +371,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            
+
             <div className="relative h-96 rounded-lg overflow-hidden">
-              <Image 
-                src="/images/Gambar Tentang Kami.jpg" 
-                alt="Tentang Kami" 
+              <Image
+                src="/images/Gambar Tentang Kami.jpg"
+                alt="Tentang Kami"
                 fill
                 className="object-cover"
               />
@@ -353,29 +397,33 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">Hubungi Kami</h2>
           <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Dapatkan informasi produk, detail, dan pemesanan melalui WhatsApp dan Instagram kami. 
-            Kami siap membantu Anda menemukan superfood terbaik untuk kebutuhan Anda.
+            Dapatkan informasi produk, detail, dan pemesanan melalui WhatsApp
+            dan Instagram kami. Kami siap membantu Anda menemukan superfood
+            terbaik untuk kebutuhan Anda.
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <MapPin className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Lokasi</h3>
               <p className="text-gray-200 text-sm">
-                Tun RT.004 RW.10, Gunungpati, Kec. Gunungpati, Kota Semarang, Jawa Tengah 50219
+                Tun RT.004 RW.10, Gunungpati, Kec. Gunungpati, Kota Semarang,
+                Jawa Tengah 50219
               </p>
             </div>
-            
+
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <Phone className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Hubungi Kami</h3>
               <p className="text-gray-200 text-sm">24 jam online</p>
             </div>
-            
+
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
               <Clock className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">Senin - Minggu 08.00 - 18.00</p>
+              <p className="text-gray-200 text-sm">
+                Senin - Minggu 08.00 - 18.00
+              </p>
             </div>
           </div>
         </div>
@@ -384,7 +432,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300">© 2024 SUPERFOOD SINAGIN. All rights reserved.</p>
+          <p className="text-gray-300">
+            © 2024 SUPERFOOD SERAGEN. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

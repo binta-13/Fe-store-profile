@@ -9,13 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { 
-  MapPin, 
-  Phone, 
-  Clock, 
-  ShoppingBag,
-  Instagram
-} from 'lucide-react';
+import { MapPin, Phone, Clock, ShoppingBag, Instagram } from 'lucide-react';
 
 export default function ContactPage() {
   const { user } = useAuth();
@@ -24,14 +18,14 @@ export default function ContactPage() {
     name: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // TODO: Implement form submission logic
     // For now, just show alert
     setTimeout(() => {
@@ -41,10 +35,12 @@ export default function ContactPage() {
     }, 1000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -54,24 +50,21 @@ export default function ContactPage() {
       <header className="bg-dark-blue text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold hover:text-gray-300 transition">
-              SUPERFOOD SINAGIN
+            <Link
+              href="/"
+              className="text-2xl font-bold hover:text-gray-300 transition"
+            >
+              SUPERFOOD SERAGEN
             </Link>
             <nav className="flex gap-6">
-              <Link 
-                href="/" 
-                className="hover:text-gray-300 transition"
-              >
+              <Link href="/" className="hover:text-gray-300 transition">
                 BERANDA
               </Link>
-              <Link 
-                href="/products" 
-                className="hover:text-gray-300 transition"
-              >
+              <Link href="/products" className="hover:text-gray-300 transition">
                 PRODUK
               </Link>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="hover:text-gray-300 transition font-semibold"
               >
                 KONTAK
@@ -89,9 +82,10 @@ export default function ContactPage() {
               Mulai Konsultasi & Pemesanan
             </h1>
             <p className="text-lg md:text-xl text-gray-200 mb-8">
-              Tentukan beragam superfood pilihan dengan kualitas terbaik dan manfaat alami untuk mendukung kesehatan setiap hari.
+              Tentukan beragam superfood pilihan dengan kualitas terbaik dan
+              manfaat alami untuk mendukung kesehatan setiap hari.
             </p>
-            <Button 
+            <Button
               className="bg-brand-red hover:bg-brand-red/90 text-white px-8 py-3 rounded-md"
               onClick={() => router.push('/products')}
             >
@@ -109,12 +103,17 @@ export default function ContactPage() {
             <div className="relative">
               {/* Dark Blue Background Overlay */}
               <div className="absolute -inset-4 bg-dark-blue rounded-lg -z-10"></div>
-              
+
               {/* White Form */}
-              <form onSubmit={handleSubmit} className="bg-white border-2 border-dark-blue rounded-lg p-6 md:p-8 relative z-10">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-white border-2 border-dark-blue rounded-lg p-6 md:p-8 relative z-10"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <Label htmlFor="name" className="text-gray-700 mb-2 block">Nama</Label>
+                    <Label htmlFor="name" className="text-gray-700 mb-2 block">
+                      Nama
+                    </Label>
                     <Input
                       id="name"
                       name="name"
@@ -126,7 +125,9 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-gray-700 mb-2 block">Email</Label>
+                    <Label htmlFor="email" className="text-gray-700 mb-2 block">
+                      Email
+                    </Label>
                     <Input
                       id="email"
                       name="email"
@@ -138,7 +139,9 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone" className="text-gray-700 mb-2 block">No Hp</Label>
+                    <Label htmlFor="phone" className="text-gray-700 mb-2 block">
+                      No Hp
+                    </Label>
                     <Input
                       id="phone"
                       name="phone"
@@ -151,7 +154,9 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="mb-6">
-                  <Label htmlFor="message" className="text-gray-700 mb-2 block">Message</Label>
+                  <Label htmlFor="message" className="text-gray-700 mb-2 block">
+                    Message
+                  </Label>
                   <Textarea
                     id="message"
                     name="message"
@@ -162,7 +167,7 @@ export default function ContactPage() {
                     className="border-gray-300"
                   />
                 </div>
-                <Button 
+                <Button
                   type="submit"
                   className="w-full bg-dark-blue hover:bg-dark-blue/90 text-white py-3 rounded-md"
                   disabled={isSubmitting}
@@ -180,8 +185,8 @@ export default function ContactPage() {
               </h2>
               <div className="flex items-center gap-3 mt-6">
                 <Phone className="h-6 w-6 text-brand-red" />
-                <a 
-                  href="tel:082226013701" 
+                <a
+                  href="tel:082226013701"
                   className="text-xl font-semibold text-gray-900 hover:text-brand-red transition"
                 >
                   0822-2601-3701
@@ -205,8 +210,8 @@ export default function ContactPage() {
               <div className="space-y-4 mt-8">
                 <div className="flex items-center gap-3">
                   <Instagram className="h-6 w-6 text-brand-red flex-shrink-0" />
-                  <a 
-                    href="https://instagram.com/superfood.sragen" 
+                  <a
+                    href="https://instagram.com/superfood.sragen"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-900 font-semibold hover:text-brand-red transition"
@@ -216,7 +221,9 @@ export default function ContactPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-6 w-6 text-brand-red flex-shrink-0" />
-                  <p className="text-gray-900 font-semibold">Superfood.sragen</p>
+                  <p className="text-gray-900 font-semibold">
+                    Superfood.sragen
+                  </p>
                 </div>
               </div>
             </div>
@@ -226,15 +233,15 @@ export default function ContactPage() {
               {/* Background Image (Grayscale) */}
               <div className="absolute inset-0 z-0 opacity-30">
                 <div className="relative w-full h-full rounded-lg overflow-hidden">
-                  <Image 
-                    src="/images/Kurma Slider 1.jpg" 
-                    alt="Background" 
+                  <Image
+                    src="/images/Kurma Slider 1.jpg"
+                    alt="Background"
                     fill
                     className="object-cover grayscale"
                   />
                 </div>
               </div>
-              
+
               {/* Map (Front) */}
               <div className="relative z-10 rounded-lg overflow-hidden shadow-lg h-96">
                 <iframe
@@ -260,24 +267,27 @@ export default function ContactPage() {
             Hubungi <span className="text-brand-red">Kami</span>
           </h2>
           <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Temukan berbagai produk superfood berkualitas dan dapatkan informasi serta penawaran melalui WhatsApp dan Instagram kami Superfood Sragen.
+            Temukan berbagai produk superfood berkualitas dan dapatkan informasi
+            serta penawaran melalui WhatsApp dan Instagram kami Superfood
+            Sragen.
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="text-center">
               <MapPin className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Lokasi</h3>
               <p className="text-gray-200 text-sm">
-                Turi, RT.04/RW.14, Gemolong, Kec. Sragen, Jawa Tengah, Jawa Tengah 57272
+                Turi, RT.04/RW.14, Gemolong, Kec. Sragen, Jawa Tengah, Jawa
+                Tengah 57272
               </p>
             </div>
-            
+
             <div className="text-center">
               <Phone className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Hubungi Kami</h3>
               <p className="text-gray-200 text-sm">0823-2801-3701</p>
             </div>
-            
+
             <div className="text-center">
               <Clock className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Jam Operasional</h3>
@@ -290,4 +300,3 @@ export default function ContactPage() {
     </div>
   );
 }
-
