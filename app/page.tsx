@@ -38,8 +38,8 @@ export default function Home() {
   const [storePhone, setStorePhone] = useState<string>('');
 
   const heroImages = [
-    '/images/Kurma_Slider_1.png',
-    '/images/Hampers_Slider_2.png',
+    '/images/Kurma_2.png',
+    '/images/Kurma Slider.png',
     '/images/Kurma_kanan.png',
   ];
 
@@ -186,7 +186,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button
-                  className="bg-brand-red hover:bg-brand-red/90 text-white px-6 py-3 rounded-none"
+                  className="bg-brand-red hover:bg-brand-red/90 text-white px-6 py-3 rounded-md"
                   onClick={() => {
                     router.push('/products');
                   }}
@@ -210,7 +210,7 @@ export default function Home() {
                   src={heroImages[heroSlideIndex]}
                   alt="Superfood products"
                   fill
-                  className="object-cover"
+                  className="object-cover mt-10"
                   priority
                 />
               </div>
@@ -311,7 +311,7 @@ export default function Home() {
                           {formatPrice(product.price)}
                         </p>
                         <Button
-                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2 mt-auto"
+                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-md text-xs md:text-sm py-2 mt-auto"
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(`/products/${product.id}`);
@@ -433,7 +433,7 @@ export default function Home() {
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-300">
-            © 2024 SUPERFOOD SERAGEN. All rights reserved.
+            © 2026 SUPERFOOD SERAGEN. All rights reserved.
           </p>
         </div>
       </footer>

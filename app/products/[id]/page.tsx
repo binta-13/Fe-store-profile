@@ -631,7 +631,7 @@ export default function ProductDetailPage() {
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-300">
-            © 2024 SUPERFOOD SRAGEN. All rights reserved.
+            © 2026 SUPERFOOD SRAGEN. All rights reserved.
           </p>
         </div>
       </footer>

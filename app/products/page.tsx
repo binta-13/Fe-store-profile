@@ -394,7 +394,7 @@ export default function ProductsPage() {
                           );
                         })()}
                         <Button
-                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-none text-xs md:text-sm py-2 mt-auto"
+                          className="w-full bg-brand-red hover:bg-brand-red/90 text-white rounded-md text-xs md:text-sm py-2 mt-auto"
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(`/products/${product.id}`);
@@ -453,7 +453,7 @@ export default function ProductsPage() {
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-300">
-            © 2024 SUPERFOOD SRAGEN. All rights reserved.
+            © 2026 SUPERFOOD SRAGEN. All rights reserved.
           </p>
         </div>
       </footer>
