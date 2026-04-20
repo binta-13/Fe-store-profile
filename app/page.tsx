@@ -39,10 +39,27 @@ export default function Home() {
   const [storePhone, setStorePhone] = useState<string>('');
 
   const heroImages = [
-    '/images/KurmaSlider-1.png',
-    '/images/HampersSlider2.png',
-    '/images/Kurma_kanan.png',
+    {
+      src: '/images/KurmaSlider-1.png',
+      className: 'object-contain mt-10 scale-90',
+      width: 800,
+      height: 400,
+    },
+    {
+      src: '/images/HampersSlider2.png',
+      className: 'cover mt-1 md:ml-[80px]',
+      width: 500,
+      height: 500,
+    },
+    // {
+    //   src: '/images/Kurma_kanan.png',
+    //   className: 'object-cover mt-1',
+    //   width: 600,
+    //   height: 40,
+    // },
   ];
+
+  const defaultHeroImageSize = { width: 800, height: 400 };
 
   // Extract unique categories from products, dengan fallback ke kategori default
   const defaultCategories = [
@@ -167,13 +184,19 @@ export default function Home() {
             </div>
             <div className="relative">
               <div className="relative h-96 rounded-lg overflow-hidden">
-                <Image
-                  src={heroImages[heroSlideIndex]}
-                  alt="Superfood products"
-                  fill
-                  className="object-cover mt-10"
-                  priority
-                />
+              <Image
+                src={heroImages[heroSlideIndex].src}
+                alt="Superfood products"
+                width={
+                  heroImages[heroSlideIndex].width || defaultHeroImageSize.width
+                }
+                height={
+                  heroImages[heroSlideIndex].height ||
+                  defaultHeroImageSize.height
+                }
+                className={heroImages[heroSlideIndex].className}
+                style={{ height: '100%' }}
+              />
               </div>
               <div className="flex justify-center gap-2 mt-4">
                 {heroImages.map((_, index) => (
