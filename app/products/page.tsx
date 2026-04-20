@@ -8,6 +8,7 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { normalizeImageUrl } from '@/lib/utils';
 import { MapPin, Phone, Clock, MessageCircle } from 'lucide-react';
+import HomeHeader from '@/components/HomeHeader';
 
 interface Product {
   id: string;
@@ -213,32 +214,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-dark-blue text-white">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="text-2xl font-bold hover:text-gray-300 transition"
-            >
-              SUPERFOOD SRAGEN
-            </Link>
-            <nav className="flex gap-6">
-              <Link href="/" className="hover:text-gray-300 transition">
-                BERANDA
-              </Link>
-              <Link
-                href="/products"
-                className="hover:text-gray-300 transition font-semibold"
-              >
-                PRODUK
-              </Link>
-              <Link href="/contact" className="hover:text-gray-300 transition">
-                KONTAK
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <HomeHeader/>
 
       {/* Hero Section */}
       <section className="bg-dark-blue text-white py-16">
@@ -290,9 +266,15 @@ export default function ProductsPage() {
           </div>
         </div>
       </section>
-
+      <Image
+        src="/images/ombak.png"
+        alt="Ombak"
+        width={1920}
+        height={20}
+        className="block w-full h-44 -mt-10"
+      />
       {/* Product Section */}
-      <section className="py-16 bg-white">
+      <section className="py-1 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
             Produk Kami

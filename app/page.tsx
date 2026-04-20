@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import HomeHeader from '@/components/HomeHeader';
 import { normalizeImageUrl } from '@/lib/utils';
 import {
   MapPin,
@@ -38,8 +39,8 @@ export default function Home() {
   const [storePhone, setStorePhone] = useState<string>('');
 
   const heroImages = [
-    '/images/Kurma_2.png',
-    '/images/Kurma Slider.png',
+    '/images/KurmaSlider-1.png',
+    '/images/HampersSlider2.png',
     '/images/Kurma_kanan.png',
   ];
 
@@ -51,6 +52,7 @@ export default function Home() {
     'Menu Sarapan',
     'Hampers',
   ];
+
   const productCategories = [
     'Semua',
     ...new Set(products.map((p) => p.category).filter(Boolean)),
@@ -129,48 +131,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-dark-blue text-white">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">SUPERFOOD SERAGEN</h1>
-            <nav className="flex gap-6">
-              <a
-                href="#beranda"
-                className="hover:text-gray-300 transition"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById('beranda')
-                    ?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                BERANDA
-              </a>
-              <a
-                href="/products"
-                className="hover:text-gray-300 transition"
-                onClick={(e) => {
-                  e.preventDefault();
-                  router.push('/products');
-                }}
-              >
-                PRODUK
-              </a>
-              <a
-                href="/contact"
-                className="hover:text-gray-300 transition"
-                onClick={(e) => {
-                  e.preventDefault();
-                  router.push('/contact');
-                }}
-              >
-                KONTAK
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <HomeHeader />
 
       {/* Hero Section */}
       <section id="beranda" className="bg-dark-blue text-white py-16">
@@ -230,9 +191,15 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      <Image
+        src="/images/ombak.png"
+        alt="Ombak"
+        width={1920}
+        height={20}
+        className="block w-full h-48 -mt-32"
+      />
       {/* Product Section */}
-      <section id="produk" className="py-16 bg-white">
+      <section id="produk" className="py-1 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
             Produk Kami
