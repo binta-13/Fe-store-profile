@@ -8,15 +8,20 @@ export default function HomeContactFooter() {
   const [storeAddress, setStoreAddress] = useState(
     'Tun RT.004 RW.10, Gunungpati, Kec. Gunungpati, Kota Semarang, Jawa Tengah 50219',
   );
+  const [storePhone, setStorePhone] = useState('24 jam online');
 
   useEffect(() => {
     const fetchStoreProfile = async () => {
       try {
         const response = await api.get('/store-profile');
         const address = response.data?.data?.address;
+        const phone = response.data?.data?.phone;
 
         if (response.data?.success && address) {
           setStoreAddress(address);
+        }
+        if (response.data?.success && phone) {
+          setStorePhone(phone);
         }
       } catch (error) {}
     };
@@ -35,23 +40,24 @@ export default function HomeContactFooter() {
             terbaik untuk kebutuhan Anda.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6 h-full flex flex-col">
               <MapPin className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Lokasi</h3>
-              <p className="text-gray-200 text-sm">{storeAddress}</p>
+              <p className="text-gray-200 text-sm leading-relaxed">{storeAddress}</p>
             </div>
 
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
+            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6 h-full flex flex-col">
               <Phone className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Hubungi Kami</h3>
-              <p className="text-gray-200 text-sm">24 jam online</p>
+              <p></p>
+              <p className="text-gray-200 text-sm leading-relaxed">{storePhone}</p>
             </div>
 
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
+            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6 h-full flex flex-col">
               <Clock className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">Senin - Minggu 08.00 - 18.00</p>
+              <p className="text-gray-200 text-sm leading-relaxed">Senin - Minggu 08.00 - 18.00</p>
             </div>
           </div>
         </div>
