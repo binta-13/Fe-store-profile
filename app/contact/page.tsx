@@ -223,7 +223,7 @@ export default function ContactPage() {
               {/* Map */}
               <div className="relative z-10 ml-0 md:ml-[-280px] mt-0 md:mt-10 rounded-lg overflow-hidden w-full max-w-full md:max-w-lg h-64 md:h-96">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.715123456789!2d110.356789!3d-7.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMDcnMjQuNSJTIDExMMKwMjEnMjQuNCJF!5e0!3m2!1sid!2sid!4v1234567890123!5m2!1sid!2sid"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.194605454706!2d110.9994533!3d-7.443709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a1dd9a0376871%3A0x61da8617946eef88!2sSuperfood%20sragen%20(kurma%2Calmond%2Champers%2C%20pudding%20%26%20makanan%20sehat%20lainnya!5e0!3m2!1sid!2sid!4v1776834782281!5m2!1sid!2sid"
                   className="w-full h-80 border-0 rounded-lg mt-3"
                   allowFullScreen
                   loading="lazy"
