@@ -50,7 +50,6 @@ export default function HomeContactFooter() {
             <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6 h-full flex flex-col">
               <Phone className="h-8 w-8 mb-4 text-brand-orange" />
               <h3 className="font-bold mb-2">Hubungi Kami</h3>
-              <p></p>
               <p className="text-gray-200 text-sm leading-relaxed">{storePhone}</p>
             </div>
 
