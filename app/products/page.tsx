@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { normalizeImageUrl } from '@/lib/utils';
 import { MapPin, Phone, Clock, MessageCircle } from 'lucide-react';
 import HomeHeader from '@/components/HomeHeader';
+import HomeContactFooter from '@/components/HomeContactFooter'
 
 interface Product {
   id: string;
@@ -395,50 +395,8 @@ export default function ProductsPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16 bg-dark-blue text-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">Hubungi Kami</h2>
-          <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Temukan berbagai produk superfood berkualitas dan dapatkan informasi
-            serta pemesanan melalui WhatsApp dan Instagram resmi Superfood
-            Sragen.
-          </p>
+      <HomeContactFooter />
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <MapPin className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Lokasi</h3>
-              <p className="text-gray-200 text-sm">
-                Turi, RT.004/RW.004, Gumantar, Kec. Mojoagung, Kabupaten Sragen,
-                Jawa Tengah 57271
-              </p>
-            </div>
-
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <Phone className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Hubungi Kami</h3>
-              <p className="text-gray-200 text-sm">0822-2001-8781</p>
-            </div>
-
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <Clock className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">
-                Senin - Minggu 08.00 - 18.00
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300">
-            © 2026 SUPERFOOD SRAGEN. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

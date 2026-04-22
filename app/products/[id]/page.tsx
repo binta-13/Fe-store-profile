@@ -16,7 +16,8 @@ import {
   ArrowLeft,
   ShoppingCart,
 } from 'lucide-react';
-
+import HomeContactFooter from '@/components/HomeContactFooter';
+import HomeHeader from '@/components/HomeHeader';
 interface Product {
   id: string;
   name: string;
@@ -258,119 +259,20 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
-        <header className="bg-dark-blue text-white">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link
-                href="/products"
-                className="text-2xl font-bold hover:text-gray-300 transition"
-              >
-                SUPERFOOD SRAGEN
-              </Link>
-              <nav className="flex gap-6">
-                <Link href="/" className="hover:text-gray-300 transition">
-                  BERANDA
-                </Link>
-                <Link
-                  href="/products"
-                  className="hover:text-gray-300 transition font-semibold"
-                >
-                  PRODUK
-                </Link>
-                <Link
-                  href="/contact"
-                  className="hover:text-gray-300 transition"
-                >
-                  KONTAK
-                </Link>
-              </nav>
-            </div>
-          </div>
-        </header>
-        <div className="flex justify-center items-center py-32">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-red"></div>
-        </div>
-      </div>
+      <HomeHeader/>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-white">
-        <header className="bg-dark-blue text-white">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link
-                href="/products"
-                className="text-2xl font-bold hover:text-gray-300 transition"
-              >
-                SUPERFOOD SRAGEN
-              </Link>
-              <nav className="flex gap-6">
-                <Link href="/" className="hover:text-gray-300 transition">
-                  BERANDA
-                </Link>
-                <Link
-                  href="/products"
-                  className="hover:text-gray-300 transition font-semibold"
-                >
-                  PRODUK
-                </Link>
-                <Link
-                  href="/contact"
-                  className="hover:text-gray-300 transition"
-                >
-                  KONTAK
-                </Link>
-              </nav>
-            </div>
-          </div>
-        </header>
-        <div className="container mx-auto px-4 py-16 text-center">
-          <p className="text-red-600 mb-4">
-            {error || 'Produk tidak ditemukan'}
-          </p>
-          <Button
-            onClick={() => router.push('/products')}
-            className="bg-brand-red hover:bg-brand-red/90 text-white"
-          >
-            Kembali ke Produk
-          </Button>
-        </div>
-      </div>
+      <HomeHeader/>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-dark-blue text-white">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/products"
-              className="text-2xl font-bold hover:text-gray-300 transition"
-            >
-              SUPERFOOD SRAGEN
-            </Link>
-            <nav className="flex gap-6">
-              <Link href="/" className="hover:text-gray-300 transition">
-                BERANDA
-              </Link>
-              <Link
-                href="/products"
-                className="hover:text-gray-300 transition font-semibold"
-              >
-                PRODUK
-              </Link>
-              <Link href="/contact" className="hover:text-gray-300 transition">
-                KONTAK
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <HomeHeader/>
 
       {/* Product Detail Section */}
       <section className="py-8 md:py-16 bg-white">
@@ -591,50 +493,7 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16 bg-dark-blue text-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">Hubungi Kami</h2>
-          <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Temukan berbagai produk superfood berkualitas dan dapatkan informasi
-            serta pemesanan melalui WhatsApp dan Instagram resmi Superfood
-            Sragen.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <MapPin className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Lokasi</h3>
-              <p className="text-gray-200 text-sm">
-                Turi, RT.004/RW.004, Gumantar, Kec. Mojoagung, Kabupaten Sragen,
-                Jawa Tengah 57271
-              </p>
-            </div>
-
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <Phone className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Hubungi Kami</h3>
-              <p className="text-gray-200 text-sm">0822-2001-8781</p>
-            </div>
-
-            <div className="bg-dark-blue border-2 border-white/20 rounded-lg p-6">
-              <Clock className="h-8 w-8 mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">
-                Senin - Minggu 08.00 - 18.00
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300">
-            © 2026 SUPERFOOD SRAGEN. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <HomeContactFooter />
     </div>
   );
 }

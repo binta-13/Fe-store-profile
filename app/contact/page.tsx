@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { MapPin, Phone, Clock, ShoppingBag, Instagram } from 'lucide-react';
 import HomeHeader from '@/components/HomeHeader';
-
+import HomeContactFooter from '@/components/HomeContactFooter'
 export default function ContactPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -224,7 +224,7 @@ export default function ContactPage() {
               <div className="relative z-10 ml-0 md:ml-[-280px] mt-0 md:mt-10 rounded-lg overflow-hidden w-full max-w-full md:max-w-lg h-64 md:h-96">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.715123456789!2d110.356789!3d-7.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMDcnMjQuNSJTIDExMMKwMjEnMjQuNCJF!5e0!3m2!1sid!2sid!4v1234567890123!5m2!1sid!2sid"
-                  className="w-full h-full border-0 rounded-lg"
+                  className="w-full h-80 border-0 rounded-lg mt-3"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -237,42 +237,7 @@ export default function ContactPage() {
       </section>
 
       {/* Footer Section */}
-      <footer className="bg-dark-blue text-white py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">
-            Hubungi <span className="text-brand-red">Kami</span>
-          </h2>
-          <p className="text-center mb-12 text-gray-200 max-w-2xl mx-auto">
-            Temukan berbagai produk superfood berkualitas dan dapatkan informasi
-            serta penawaran melalui WhatsApp dan Instagram kami Superfood
-            Sragen.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="text-center">
-              <MapPin className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Lokasi</h3>
-              <p className="text-gray-200 text-sm">
-                Turi, RT.04/RW.14, Gemolong, Kec. Sragen, Jawa Tengah, Jawa
-                Tengah 57272
-              </p>
-            </div>
-
-            <div className="text-center">
-              <Phone className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Hubungi Kami</h3>
-              <p className="text-gray-200 text-sm">0823-2801-3701</p>
-            </div>
-
-            <div className="text-center">
-              <Clock className="h-8 w-8 mx-auto mb-4 text-brand-orange" />
-              <h3 className="font-bold mb-2">Jam Operasional</h3>
-              <p className="text-gray-200 text-sm">Senin - Minggu</p>
-              <p className="text-gray-200 text-sm">09.00 - 16.00</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <HomeContactFooter />
     </div>
   );
 }
