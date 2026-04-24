@@ -198,9 +198,13 @@ export default function ContactPage() {
 
                 <div className="flex items-center gap-3">
                   <MapPin className="h-5 w-5 md:h-6 md:w-6 text-brand-red flex-shrink-0" />
-                  <p className="text-gray-900 font-semibold text-sm md:text-base">
+                  <a className="text-gray-900 font-semibold text-sm md:text-base"
+                     href='https://www.google.com.sg/maps/place/Superfood+sragen+(kurma,almond,hampers,+pudding+%26+makanan+sehat+lainnya/@-7.443709,110.9994533,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a1dd9a0376871:0x61da8617946eef88!8m2!3d-7.443709!4d110.9994533!16s%2Fg%2F11pr2d_md1?entry=tts&g_ep=EgoyMDI2MDQyMC4wIPu8ASoASAFQAw%3D%3D&skid=2439d0bb-cbe5-4c30-bc32-85522f5c77fc'
+                     target='_blank'
+                     rel='noopener noreferrer' 
+                  >
                     Superfood.sragen
-                  </p>
+                  </a>
                 </div>
               </div>
             </div>
