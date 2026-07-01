@@ -5,6 +5,7 @@ import { Clock, MapPin, Phone } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function HomeContactFooter() {
+  const [storeName, setStoreName] = useState('SUPERFOOD SERAGEN');
   const [storeAddress, setStoreAddress] = useState(
     'Tun RT.004 RW.10, Gunungpati, Kec. Gunungpati, Kota Semarang, Jawa Tengah 50219',
   );
@@ -14,14 +15,12 @@ export default function HomeContactFooter() {
     const fetchStoreProfile = async () => {
       try {
         const response = await api.get('/store-profile');
-        const address = response.data?.data?.address;
-        const phone = response.data?.data?.phone;
+        const data = response.data?.data;
 
-        if (response.data?.success && address) {
-          setStoreAddress(address);
-        }
-        if (response.data?.success && phone) {
-          setStorePhone(phone);
+        if (response.data?.success) {
+          if (data.name) setStoreName(data.name);
+          if (data.address) setStoreAddress(data.address);
+          if (data.phone) setStorePhone(data.phone);
         }
       } catch (error) {}
     };
@@ -64,7 +63,7 @@ export default function HomeContactFooter() {
 
       <footer className="bg-dark-blue text-white py-6 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300">© 2026 SUPERFOOD SERAGEN. All rights reserved.</p>
+          <p className="text-gray-300">© 2026 {storeName}. All rights reserved.</p>
         </div>
       </footer>
     </>

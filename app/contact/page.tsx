@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ import HomeContactFooter from '@/components/HomeContactFooter'
 export default function ContactPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const [storePhone, setStorePhone] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,6 +24,25 @@ export default function ContactPage() {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchStoreProfile = async () => {
+      try {
+        const response = await api.get('/store-profile');
+        if (response.data?.success && response.data?.data?.phone) {
+          setStorePhone(response.data.data.phone);
+        }
+      } catch (err) {}
+    };
+    fetchStoreProfile();
+  }, []);
+
+  const formatPhone = (phone: string) => {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 8) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,10 +180,10 @@ export default function ContactPage() {
               <div className="flex items-center gap-3 mt-6">
                 <Phone className="h-5 w-5 md:h-6 md:w-6 text-brand-red" />
                 <a
-                  href="tel:082226013701"
+                  href={`tel:${storePhone}`}
                   className="text-lg md:text-xl font-semibold text-gray-900 hover:text-brand-red transition"
                 >
-                  0822-2601-3701
+                  {storePhone ? formatPhone(storePhone) : 'Memuat...'}
                 </a>
               </div>
             </div>

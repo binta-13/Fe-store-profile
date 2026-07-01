@@ -1,22 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import api from '@/lib/api';
+//import Image from 'next/image';
 export default function HomeHeader() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [storeName, setStoreName] = useState('SUPERFOOD SERAGEN');
 
-  const scrollToBeranda = () => {
-    document.getElementById('beranda')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    const fetchStoreProfile = async () => {
+      try {
+        const response = await api.get('/store-profile');
+        if (response.data?.success && response.data?.data?.name) {
+          setStoreName(response.data.data.name);
+        }
+      } catch (err) {}
+    };
+    fetchStoreProfile();
+  }, []);
+
+  // const scrollToBeranda = () => {
+  //   document.getElementById('beranda')?.scrollIntoView({ behavior: 'smooth' });
+  // };
 
   return (
     <header className="bg-dark-blue text-white">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <a href='/'>
-          <h1 className="text-lg md:text-2xl font-bold">SUPERFOOD SERAGEN</h1>
+          <h1 className="text-lg md:text-2xl font-bold">{storeName}</h1>
           </a>
 
           <nav className="hidden md:flex gap-6">
