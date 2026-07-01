@@ -35,6 +35,7 @@ interface Promo {
   appliesTo?: 'all' | 'products' | 'categories';
   productIds?: string[];
   categoryIds?: string[];
+  image?: string;
 }
 
 export default function ProductsPage() {
@@ -341,6 +342,19 @@ export default function ProductsPage() {
                           fill
                           className="object-cover"
                         />
+                        {(() => {
+                          const best = getBestPromoForProduct(product);
+                          if (!best || !best.promo.image) return null;
+                          return (
+                            <div className="absolute top-0 right-0 w-16 h-16 md:w-20 md:h-20 z-10">
+                              <img
+                                src={normalizeImageUrl(best.promo.image)}
+                                alt="Promo"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                          );
+                        })()}
                       </div>
                       <div className="p-3 md:p-4 flex flex-col flex-1">
                         <h3 className="font-bold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">

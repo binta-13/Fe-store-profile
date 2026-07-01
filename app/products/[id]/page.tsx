@@ -47,6 +47,7 @@ interface Promo {
   appliesTo?: 'all' | 'products' | 'categories';
   productIds?: string[];
   categoryIds?: string[];
+  image?: string;
 }
 
 export default function ProductDetailPage() {
@@ -354,9 +355,6 @@ export default function ProductDetailPage() {
 
                 return (
                   <div className="space-y-1">
-                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-semibold">
-                      Promo: {best.promo.name}
-                    </div>
                     <div className="flex items-baseline gap-3">
                       <span className="text-lg text-gray-500 line-through">
                         {formatPrice(product.price)}
@@ -380,6 +378,37 @@ export default function ProductDetailPage() {
                   </p>
                 </div>
               )}
+
+              {/* Promo */}
+              {(() => {
+                const best = getBestPromoForProduct(product);
+                if (!best) return null;
+                return (
+                  <div className="space-y-2 p-4 border border-green-200 rounded-lg bg-green-50">
+                    <div className="flex items-center gap-3">
+                      {best.promo.image && (
+                        <div className="w-14 h-14 md:w-20 md:h-20 flex-shrink-0">
+                          <img
+                            src={normalizeImageUrl(best.promo.image)}
+                            alt={best.promo.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-semibold">
+                          Promo: {best.promo.name}
+                        </div>
+                        {best.promo.code && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            Kode: <span className="font-mono font-semibold">{best.promo.code}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Product Details */}
               <div className="space-y-3 pt-4 border-t border-gray-200">
