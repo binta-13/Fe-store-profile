@@ -16,7 +16,7 @@ export function normalizeImageUrl(url: string): string {
   // Convert Google Drive share link to direct image URL
   const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
   if (driveMatch) {
-    return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
   }
   
   // If already a full URL (starts with http:// or https://), return as is
