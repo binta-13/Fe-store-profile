@@ -12,9 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import Image from 'next/image';
-import { X, Image as ImageIcon } from 'lucide-react';
 import api from '@/lib/api';
+import { normalizeImageUrl } from '@/lib/utils';
 
 interface PromoFormData {
   name: string;
@@ -422,13 +421,11 @@ export default function PromoForm({
               placeholder="https://example.com/promo.jpg"
             />
             {formData.image && (
-              <div className="relative w-32 h-32 rounded-md overflow-hidden border mt-2">
-                <Image
-                  src={formData.image}
+              <div className="w-32 h-32 rounded-md overflow-hidden border mt-2">
+                <img
+                  src={normalizeImageUrl(formData.image)}
                   alt="Promo preview"
-                  fill
-                  className="object-cover"
-                  unoptimized
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
