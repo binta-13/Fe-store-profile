@@ -6,10 +6,18 @@ import Link from 'next/link';
 import Cookies from 'js-cookie';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,19 +48,32 @@ export default function LoginPage() {
       if (response.data.success) {
         const { token, user: userData } = response.data.data;
         Cookies.set('token', token, { expires: 7 });
-        
+        toast.success('Login berhasil! Selamat datang kembali.');
+
         // Redirect based on role with page reload for admin
         if (userData?.role === 'admin' || userData?.role === 'sub_admin') {
-          window.location.href = '/admin/dashboard';
+          setTimeout(() => {
+            window.location.href = '/admin/dashboard';
+          }, 1500);
         } else {
-          router.push('/');
+          setTimeout(() => {
+            router.push('/');
+          }, 1500);
           setLoading(false);
         }
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Login failed');
+      const message =
+        err.response?.data?.message || err.message || 'Login failed';
+      const userMessage =
+        message.toLowerCase().includes('invalid') ||
+        message.toLowerCase().includes('credential')
+          ? 'Password atau email salah'
+          : message;
+      setError(userMessage);
+      toast.error(userMessage, { duration: 8000 });
       setLoading(false);
     }
   };
@@ -61,7 +82,9 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Login
+          </CardTitle>
           <CardDescription className="text-center">
             Masuk ke akun Anda untuk melanjutkan
           </CardDescription>
@@ -114,4 +137,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

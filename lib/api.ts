@@ -24,10 +24,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      Cookies.remove('token');
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+      const url = error.config?.url || '';
+      if (!url.includes('/auth/login')) {
+        Cookies.remove('token');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
