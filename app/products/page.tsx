@@ -45,6 +45,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [promos, setPromos] = useState<Promo[]>([]);
+  const [storePhone, setStorePhone] = useState<string>('');
 
   // Extract unique categories from products, dengan fallback ke kategori default
   const defaultCategories = ['Semua', 'Makanan', 'Minuman', 'Hampers'];
@@ -61,9 +62,10 @@ export default function ProductsPage() {
         setLoading(true);
         setError(null);
 
-        const [productsResponse, promosResponse] = await Promise.all([
+        const [productsResponse, promosResponse, storeResponse] = await Promise.all([
           api.get('/products'),
           api.get('/promos'),
+          api.get('/store-profile'),
         ]);
 
         if (productsResponse.data.success) {
@@ -103,6 +105,10 @@ export default function ProductsPage() {
 
           setPromos(activePromos);
         }
+
+        if (storeResponse.data?.success && storeResponse.data?.data?.phone) {
+          setStorePhone(storeResponse.data.data.phone);
+        }
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.response?.data?.message || 'Gagal mengambil data produk');
@@ -113,6 +119,14 @@ export default function ProductsPage() {
 
     fetchData();
   }, []);
+
+  const getWhatsAppUrl = () => {
+    let digits = (storePhone || '').replace(/\D/g, '');
+    if (!digits) return 'https://wa.me/';
+    if (digits.startsWith('0')) digits = `62${digits.slice(1)}`;
+    if (digits.startsWith('8')) digits = `62${digits}`;
+    return `https://wa.me/${digits}`;
+  };
 
   const filteredProducts =
     activeCategory === 'Semua'
@@ -245,7 +259,7 @@ export default function ProductsPage() {
               <Button
                 className="bg-brand-red hover:bg-brand-red/90 text-white px-8 py-3 rounded-md flex items-center gap-2 mx-auto"
                 onClick={() => {
-                  window.open('https://wa.me/6282220018781', '_blank');
+                  window.open(getWhatsAppUrl(), '_blank');
                 }}
               >
                 <MessageCircle className="h-5 w-5" />

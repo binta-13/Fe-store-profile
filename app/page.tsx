@@ -534,12 +534,12 @@ export default function Home() {
             </div>
 
             {/* Icon Good di tengah bawah antara text dan image */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-6 flex flex-col items-center z-10">
+            {/* <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-6 flex flex-col items-center z-10">
               <div className="bg-brand-red text-white px-8 py-3 rounded-2xl flex flex-col items-center gap-3 shadow-xl">
                 <ThumbsUp className="h-7 w-7 stroke-2 stroke-white fill-none" />
                 <span className="font-semibold text-base">Sejak 2011</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

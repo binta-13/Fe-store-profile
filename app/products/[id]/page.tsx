@@ -62,6 +62,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [promos, setPromos] = useState<Promo[]>([]);
+  const [storePhone, setStorePhone] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,10 +70,12 @@ export default function ProductDetailPage() {
         setLoading(true);
         setError(null);
 
-        const [productResponse, promosResponse] = await Promise.all([
-          api.get(`/products/${productId}`),
-          api.get('/promos'),
-        ]);
+        const [productResponse, promosResponse, storeResponse] =
+          await Promise.all([
+            api.get(`/products/${productId}`),
+            api.get('/promos'),
+            api.get('/store-profile'),
+          ]);
 
         if (productResponse.data.success) {
           setProduct(productResponse.data.data);
@@ -107,6 +110,10 @@ export default function ProductDetailPage() {
           );
 
           setPromos(activePromos);
+        }
+
+        if (storeResponse.data?.success && storeResponse.data?.data?.phone) {
+          setStorePhone(storeResponse.data.data.phone);
         }
       } catch (err: any) {
         console.error('Error fetching product:', err);
@@ -218,6 +225,14 @@ export default function ProductDetailPage() {
     };
   };
 
+  const getWhatsAppUrl = () => {
+    let digits = (storePhone || '').replace(/\D/g, '');
+    if (!digits) return 'https://wa.me/';
+    if (digits.startsWith('0')) digits = `62${digits.slice(1)}`;
+    if (digits.startsWith('8')) digits = `62${digits}`;
+    return `https://wa.me/${digits}`;
+  };
+
   // Handle checkout
   const handleCheckout = async () => {
     if (!product) return;
@@ -259,21 +274,17 @@ export default function ProductDetailPage() {
   const images = getProductImages();
 
   if (loading) {
-    return (
-      <HomeHeader/>
-    );
+    return <HomeHeader />;
   }
 
   if (error || !product) {
-    return (
-      <HomeHeader/>
-    );
+    return <HomeHeader />;
   }
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <HomeHeader/>
+      <HomeHeader />
 
       {/* Product Detail Section */}
       <section className="py-8 md:py-16 bg-white">
@@ -401,7 +412,10 @@ export default function ProductDetailPage() {
                         </div>
                         {best.promo.code && (
                           <p className="text-xs text-gray-600 mt-1">
-                            Kode: <span className="font-mono font-semibold">{best.promo.code}</span>
+                            Kode:{' '}
+                            <span className="font-mono font-semibold">
+                              {best.promo.code}
+                            </span>
                           </p>
                         )}
                       </div>
@@ -493,7 +507,8 @@ export default function ProductDetailPage() {
                   onClick={handleCheckout}
                   disabled={
                     checkoutLoading ||
-                    (product.stock !== undefined && product.stock === 0)
+                    (product.stock !== undefined &&
+                      (product.stock === 0 || quantity > product.stock))
                   }
                 >
                   {checkoutLoading ? (
@@ -505,16 +520,16 @@ export default function ProductDetailPage() {
                     </>
                   )}
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="flex-1 border-brand-red text-brand-red hover:bg-brand-red hover:text-white py-6 text-lg"
                   onClick={() => {
-                    window.open('https://wa.me/6282220018781', '_blank');
+                    window.open(getWhatsAppUrl(), '_blank');
                   }}
                 >
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Chat WhatsApp
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>

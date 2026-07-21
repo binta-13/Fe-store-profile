@@ -2,7 +2,13 @@
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AdminLayout from '@/components/AdminLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
@@ -109,9 +115,7 @@ export default function AdminDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.orders}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Pesanan masuk
-                  </p>
+                  <p className="text-xs text-muted-foreground">Pesanan masuk</p>
                 </CardContent>
               </Card>
             </div>
@@ -120,9 +124,7 @@ export default function AdminDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Akses cepat ke fitur utama
-              </CardDescription>
+              <CardDescription>Akses cepat ke fitur utama</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <a
@@ -152,7 +154,7 @@ export default function AdminDashboardPage() {
                   Kelola promo dan diskon
                 </p>
               </a>
-              <a
+              {/* <a
                 href="/admin/checkout"
                 className="p-4 border rounded-lg hover:bg-accent transition-colors"
               >
@@ -160,7 +162,7 @@ export default function AdminDashboardPage() {
                 <p className="text-sm text-muted-foreground">
                   Generate WhatsApp link
                 </p>
-              </a>
+              </a> */}
               {isAdmin && (
                 <a
                   href="/admin/users"
@@ -179,4 +181,3 @@ export default function AdminDashboardPage() {
     </ProtectedRoute>
   );
 }
-

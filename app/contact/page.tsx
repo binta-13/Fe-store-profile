@@ -17,6 +17,7 @@ export default function ContactPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [storePhone, setStorePhone] = useState('');
+  const [storeEmail, setStoreEmail] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,8 +30,10 @@ export default function ContactPage() {
     const fetchStoreProfile = async () => {
       try {
         const response = await api.get('/store-profile');
-        if (response.data?.success && response.data?.data?.phone) {
-          setStorePhone(response.data.data.phone);
+        if (response.data?.success) {
+          const data = response.data.data;
+          if (data.phone) setStorePhone(data.phone);
+          if (data.email) setStoreEmail(data.email);
         }
       } catch (err) {}
     };
@@ -48,13 +51,14 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // TODO: Implement form submission logic
-    // For now, just show alert
-    setTimeout(() => {
-      alert('Terima kasih! Pesan Anda telah terkirim.');
-      setFormData({ name: '', email: '', phone: '', message: '' });
-      setIsSubmitting(false);
-    }, 1000);
+    const subject = encodeURIComponent(`Pesan dari ${formData.name}`);
+    const body = encodeURIComponent(
+      `Nama: ${formData.name}\nEmail: ${formData.email}\nNo HP: ${formData.phone}\n\nPesan:\n${formData.message}`,
+    );
+    window.location.href = `mailto:${storeEmail}?subject=${subject}&body=${body}`;
+
+    setFormData({ name: '', email: '', phone: '', message: '' });
+    setIsSubmitting(false);
   };
 
   const handleChange = (

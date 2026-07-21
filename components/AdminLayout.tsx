@@ -77,12 +77,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               >
                 Promos
               </Link>
-              <Link
+              {/* <Link
                 href="/admin/checkout"
                 className="text-sm font-medium text-gray-700 hover:text-gray-900"
               >
                 Checkout
-              </Link>
+              </Link> */}
               {isAdmin && (
                 <Link
                   href="/admin/users"
@@ -96,9 +96,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="ml-auto flex items-center space-x-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
                   <Avatar>
-                    <AvatarImage src={user?.image} alt={user?.displayName || user?.email} />
+                    <AvatarImage
+                      src={user?.image}
+                      alt={user?.displayName || user?.email}
+                    />
                     <AvatarFallback>
                       {getInitials(user?.displayName, user?.email)}
                     </AvatarFallback>
@@ -130,10 +136,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto py-8 px-6">
-        {children}
-      </main>
+      <main className="container mx-auto py-8 px-6">{children}</main>
     </div>
   );
 }
-
