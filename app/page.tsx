@@ -312,19 +312,20 @@ export default function Home() {
             </div>
             <div className="relative">
               <div className="relative h-96 rounded-lg overflow-hidden">
-              <Image
-                src={heroImages[heroSlideIndex].src}
-                alt="Superfood products"
-                width={
-                  heroImages[heroSlideIndex].width || defaultHeroImageSize.width
-                }
-                height={
-                  heroImages[heroSlideIndex].height ||
-                  defaultHeroImageSize.height
-                }
-                className={heroImages[heroSlideIndex].className}
-                style={{ height: '100%' }}
-              />
+                <Image
+                  src={heroImages[heroSlideIndex].src}
+                  alt="Superfood products"
+                  width={
+                    heroImages[heroSlideIndex].width ||
+                    defaultHeroImageSize.width
+                  }
+                  height={
+                    heroImages[heroSlideIndex].height ||
+                    defaultHeroImageSize.height
+                  }
+                  className={heroImages[heroSlideIndex].className}
+                  style={{ height: '100%' }}
+                />
               </div>
               <div className="flex justify-center gap-2 mt-4">
                 {heroImages.map((_, index) => (
@@ -534,12 +535,12 @@ export default function Home() {
             </div>
 
             {/* Icon Good di tengah bawah antara text dan image */}
-            {/* <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-6 flex flex-col items-center z-10">
+            <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-6 flex flex-col items-center z-10">
               <div className="bg-brand-red text-white px-8 py-3 rounded-2xl flex flex-col items-center gap-3 shadow-xl">
                 <ThumbsUp className="h-7 w-7 stroke-2 stroke-white fill-none" />
-                <span className="font-semibold text-base">Sejak 2011</span>
+                <span className="font-semibold text-base">Sejak 2018</span>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </section>

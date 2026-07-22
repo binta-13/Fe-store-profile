@@ -244,9 +244,13 @@ export default function ProductDetailPage() {
         user?.displayName || user?.email?.split('@')[0] || 'Customer';
       const customerPhone = user?.phone || '081234567890';
 
+      const best = getBestPromoForProduct(product);
+      const unitPrice = best ? best.finalPrice : product.price;
+
       const response = await api.post('/checkout', {
         productId: product.id,
         quantity: quantity,
+        price: unitPrice,
         customerName: customerName,
         customerPhone: customerPhone,
       });
