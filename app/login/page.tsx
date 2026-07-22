@@ -133,12 +133,12 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Loading...' : 'Login'}
             </Button>
-            {/* <p className="text-sm text-center text-muted-foreground">
+            <p className="text-sm text-center text-muted-foreground">
               Belum punya akun?{' '}
               <Link href="/register" className="text-primary hover:underline">
                 Daftar sekarang
               </Link>
-            </p> */}
+            </p>
           </CardFooter>
         </form>
       </Card>
