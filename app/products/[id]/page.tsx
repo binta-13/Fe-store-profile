@@ -246,20 +246,44 @@ export default function ProductDetailPage() {
 
       const best = getBestPromoForProduct(product);
       const unitPrice = best ? best.finalPrice : product.price;
+      const total = unitPrice * quantity;
 
-      const response = await api.post('/checkout', {
+      // Call API for order record (ignore returned whatsappUrl)
+      await api.post('/checkout', {
         productId: product.id,
         quantity: quantity,
         price: unitPrice,
         customerName: customerName,
         customerPhone: customerPhone,
-      });
+      }).catch(() => {});
 
-      if (response.data.success && response.data.data?.whatsappUrl) {
-        window.open(response.data.data.whatsappUrl, '_blank');
-      } else {
-        alert('Gagal membuat checkout link');
+      // Build WhatsApp URL directly with correct total (promo applied)
+      let digits = (storePhone || '').replace(/\D/g, '');
+      if (!digits) {
+        alert('Nomor telepon toko tidak ditemukan');
+        return;
       }
+      if (digits.startsWith('0')) digits = `62${digits.slice(1)}`;
+      if (digits.startsWith('8')) digits = `62${digits}`;
+
+      const lines = [
+        'Halo, saya ingin memesan:',
+        '',
+        `Produk: ${product.name}`,
+        `Jumlah: ${quantity}`,
+        `Harga: ${formatPrice(unitPrice)}`,
+        `Total: ${formatPrice(total)}`,
+      ];
+
+      if (best) {
+        lines.push(`Promo: ${best.promo.name} (diskon ${formatPrice(best.discountAmount)})`);
+      }
+
+      lines.push('', `Nama: ${customerName}`, `No. HP: ${customerPhone}`);
+
+      const message = lines.join('\n');
+      const whatsappUrl = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
     } catch (err: any) {
       console.error('Error checkout:', err);
       const errorMessage =
