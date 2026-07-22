@@ -111,12 +111,12 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link
+                {/* <Link
                   href="/login/forgot-password"
                   className="text-sm text-primary hover:underline"
                 >
                   Lupa password?
-                </Link>
+                </Link> */}
               </div>
               <Input
                 id="password"
