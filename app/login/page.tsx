@@ -109,7 +109,15 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="/login/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Lupa password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -125,12 +133,12 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Loading...' : 'Login'}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
+            {/* <p className="text-sm text-center text-muted-foreground">
               Belum punya akun?{' '}
               <Link href="/register" className="text-primary hover:underline">
                 Daftar sekarang
               </Link>
-            </p>
+            </p> */}
           </CardFooter>
         </form>
       </Card>
